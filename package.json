@@ -1,11 +1,11 @@
 {
-  "name": "node-rest",
+  "name": "api-rest",
   "version": "0.0.1",
   "description": "",
   "main": "dist/server.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fabionogueira/node-rest.git"
+    "url": "https://github.com/fabionogueira/api-rest.git"
   },
   "author": {
     "name": "Fábio Nogueira",

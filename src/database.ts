@@ -5,7 +5,7 @@ import * as path from 'path';
 
 let instance:any = {};
 
-export default class Database{
+export class Database{
     private transaction:boolean = false;
     private rowsPending:Array<any> = [];
     private dbdata:Array<any>;

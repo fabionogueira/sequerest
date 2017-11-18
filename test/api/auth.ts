@@ -1,5 +1,5 @@
 import MyDB from '../db/mydb';
-import Auth from '../../src/auth';
+import {Auth} from '../../src/auth';
 
 export default {
     routers: {

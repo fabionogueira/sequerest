@@ -21,7 +21,7 @@ let userDev:any = {
     definition:{}
 };
 
-export default class {
+export class Auth {
     public static config(options:any){
         tokenTimeout = options.tokenTimeout;
         appId        = options.appId;

@@ -1,12 +1,12 @@
 
 import * as express from "express"
 import * as bodyParser from 'body-parser'
-import auth from './auth'
-import validator from './validator'
+import {Auth} from './auth'
+import {Validator} from './validator'
 
 const app: any = express();
 
-export default class Server {
+export class Server {
     private static started = false
     private static database: any
     private static registeredRouters:Array<any> = []
@@ -71,7 +71,7 @@ export default class Server {
                         fieldModelDef = definition.model[fieldName];
                         if (Object.prototype.toString.call(fieldModelDef) == '[object Object]') {
                             for (fieldModelItem in fieldModelDef) {
-                                validate = validator.get(fieldModelItem);
+                                validate = Validator.get(fieldModelItem);
                                 if (validate) {
                                     newValue = validate(data[fieldName], errs, fieldModelDef, fieldName);
                                     if (newValue!==undefined){

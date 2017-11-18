@@ -1,0 +1,10 @@
+.vscode
+dev
+public
+src
+test
+LEIAME.txt
+mydb.json
+package-lock.json
+tsconfig.dev.json
+tsconfig.prod.json

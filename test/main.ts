@@ -1,9 +1,10 @@
-import server from '../src/server'
+import {Server} from '../src/server'
+
 import pessoa from './api/pessoa'
 import auth from './api/auth'
 import config from './config'
 
-server
+Server
     .config(config)
     
     .route('/api/pessoa/', pessoa)

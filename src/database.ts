@@ -8,7 +8,7 @@ let instance:any = {};
 export class Database{
     private transaction:boolean = false;
     private rowsPending:Array<any> = [];
-    private dbdata:Array<any>;
+    private dbdata:Array<any> = [];
     private dbid:number;
 
     constructor(private filename:string){
@@ -26,12 +26,12 @@ export class Database{
                 this.dbdata = json.rows || [];                
             } catch (error) {
                 json = {};
-                this.dbdata = [];
             }
 
             this.dbid = Number(json.id || 1);
         }
 
+        this.dbdata = this.dbdata || [];
         instance[filename] = this;
     }
 

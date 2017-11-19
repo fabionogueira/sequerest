@@ -1,8 +1,8 @@
 {
   "name": "api-rest",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/fabionogueira/api-rest.git"

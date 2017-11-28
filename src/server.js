@@ -1,46 +1,54 @@
+const express = require('express')
+const bodyParser = require('body-parser')
+const {Auth} = require('./auth')
+const {Validator} = require('./validator')
+const {cors} = require('./cors')
+const {Proxy} = require('./proxy')
 
-import * as express from "express"
-import * as bodyParser from 'body-parser'
-import {Auth} from './auth'
-import {Validator} from './validator'
+const app = express();
 
-const app: any = express();
+let _started = false;
+let _database = null;
+let _registeredRouters = [];
+let _conf = null;
 
-export class Server {
-    private static started = false
-    private static database: any
-    private static registeredRouters:Array<any> = []
-    private static conf:any
+class Server {
 
-    public static config(config:any){
+    static config(config){
+        if (config.cors===true || config.cors===undefined){
+            app.use(cors)
+        }
+
         app.use(express.static(config.public))
         app.use(bodyParser.json())
         app.use(bodyParser.urlencoded({ extended: false }))
 
-        this.conf = config
+        Proxy.config(config.proxy, app);
+        
+        _conf = config
 
         return this;
     }
 
-    public static start() {
-        let server: any;
+    static start() {
+        let server;
         
-        if ( !this.registeredRouters.find(item=>{return item.pathname=='/'}) ){
+        if ( !_registeredRouters.find(item=>{return item.pathname=='/'}) ){
             app.get('/', root);
         }
 
-        if (!this.started) {
-            this.started = true;
-            server = app.listen(this.conf.port);
+        if (!_started) {
+            _started = true;
+            server = app.listen(_conf.port);
             console.log('server running in %s', server.address().port);
         }
     }
 
-    public static getRouters(){
-        return this.registeredRouters;
+    static getRouters(){
+        return _registeredRouters;
     }
 
-    public static route(pathname:any, method?:any, definition?:any) {
+    static route(pathname, method=null, definition=null) {
         let path, a;
 
         if (typeof(pathname)=='string'){
@@ -49,7 +57,7 @@ export class Server {
         
         // ("/api/path/", "get", function(){})
         if ( arguments.length == 3 ) {
-            this.registeredRouters.push({pathname: pathname, method: method});
+            _registeredRouters.push({pathname: pathname, method: method});
             app[method](pathname, definition);
         }
 
@@ -61,10 +69,10 @@ export class Server {
         
             definition.id = definition.id || 'id';
 
-            definition.getData = definition.getData || function (data:any) {
-                let fieldName:string, fieldModelDef:any, fieldModelItem:string, validate:Function, newValue:any;
-                let errs: Array<string> = [];
-                let newData: any = {};
+            definition.getData = definition.getData || function (data) {
+                let fieldName, fieldModelDef, fieldModelItem, validate, newValue;
+                let errs = [];
+                let newData = {};
 
                 if (definition.model) {
                     for (fieldName in definition.model) {
@@ -97,7 +105,7 @@ export class Server {
                 return data;
             };
 
-            definition.create = definition.create || function (req: any, res: any) {
+            definition.create = definition.create || function (req, res) {
                 let data = definition.getData(req.body);
 
                 if (data.error) {
@@ -108,12 +116,12 @@ export class Server {
                 res.status(201).json(data)
             };
 
-            definition.read = definition.read || function (req: any, res: any) {
+            definition.read = definition.read || function (req, res) {
                 let data = definition.database ? definition.database.read(req.params.id) : []
                 res.status(200).json(data)
             };
 
-            definition.update = definition.update || function (req: any, res: any) {
+            definition.update = definition.update || function (req, res) {
                 let data = definition.getData(req.body)
 
                 if (!req.params[definition.id]) {
@@ -128,8 +136,8 @@ export class Server {
                 res.status(200).json(data)
             };
 
-            definition.delete = definition.delete || function (req: any, res: any) {
-                let count: number;
+            definition.delete = definition.delete || function (req, res) {
+                let count;
                 
                 if (!req.params[definition.id]) {
                     return res.status(400).json([definition.id + ' is required']);
@@ -144,11 +152,11 @@ export class Server {
                 }
             };
             
-            this.registeredRouters.push({pathname: pathname, method:'get'});
-            this.registeredRouters.push({pathname: pathname + ':id', method:'get'});
-            this.registeredRouters.push({pathname: pathname, method:'post'});
-            this.registeredRouters.push({pathname: pathname + ':id', method:'put'});
-            this.registeredRouters.push({pathname: pathname + ':id', method:'delete'});
+            _registeredRouters.push({pathname: pathname, method:'get'});
+            _registeredRouters.push({pathname: pathname + ':id', method:'get'});
+            _registeredRouters.push({pathname: pathname, method:'post'});
+            _registeredRouters.push({pathname: pathname + ':id', method:'put'});
+            _registeredRouters.push({pathname: pathname + ':id', method:'delete'});
 
             app.get(pathname, definition.read);
             app.get(pathname + ':id', definition.read);
@@ -172,7 +180,7 @@ export class Server {
                     a[0] = a[0].toLowerCase()
                     a[1] = normalizePath(a[1])
                     
-                    this.registeredRouters.push({pathname:a[1], method:a[0]});
+                    _registeredRouters.push({pathname:a[1], method:a[0]});
                     app[a[0]](a[1], definition.routers[path]);
                 }
             }
@@ -183,14 +191,14 @@ export class Server {
 
 }
 
-function normalizePath(pathname:string){
+function normalizePath(pathname){
     pathname = pathname.trim();
     pathname = pathname.substring(pathname.length-1) == '/' ? pathname : pathname + '/';
 
     return pathname
 }
 
-function root(req: any, res: any){
+function root(req, res){
     let html, s;
     let list = '';
     let routers = Server.getRouters();
@@ -209,3 +217,5 @@ function root(req: any, res: any){
 
     res.status(200).send(html);
 }
+
+exports.Server = Server

@@ -21,7 +21,7 @@
             "runtimeArgs": [
                 "--inspect=5858"
             ],
-            "program": "${workspaceRoot}/dev/test/main.js",
+            "program": "${workspaceRoot}/test/main.js",
             "restart": true,
             "port": 5858,
             "console": "integratedTerminal",

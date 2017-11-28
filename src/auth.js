@@ -7,22 +7,22 @@
 const jwt = require("jsonwebtoken")
 const md5 = require("md5")
 
-let publicKey:string; 
-let privateKey:string;
-let appId:string;
-let ldapId:string; 
-let tokenTimeout:string;
-let LDAP_CONFIG:any;
+let publicKey; 
+let privateKey;
+let appId;
+let ldapId; 
+let tokenTimeout;
+let LDAP_CONFIG;
 let tokensPath = './';
 let tokenRefreshTM = (new Date()).getTime();
-let userDev:any = {
+let userDev = {
     username:'',
     password:'',
     definition:{}
 };
 
-export class Auth {
-    public static config(options:any){
+class Auth {
+    static config(options){
         tokenTimeout = options.tokenTimeout;
         appId        = options.appId;
         publicKey    = options.publicKey;
@@ -37,7 +37,7 @@ export class Auth {
     /**
      * @description Cria um token
      */
-    public static tokenCreate(expiresIn:string='1d', payload:any={}):string{
+    static tokenCreate(expiresIn='1d', payload={}){
         //cria o token com base na chave privada
         return jwt.sign(payload || {}, privateKey, {
             "algorithm": 'RS256',
@@ -45,12 +45,12 @@ export class Auth {
         });
     }
 
-    public static tokenValidate(token:string):Promise<any>{
+    static tokenValidate(token){
 
         return new Promise((resolve, reject)=>{
 
             //valida o token usando a chave pÃºblica
-            jwt.verify(token, publicKey, (err:any, data:any)=>{
+            jwt.verify(token, publicKey, (err, data)=>{
                 //token invÃ¡lido ou expirado!
                 if (err) {
                     err.token = token;
@@ -64,8 +64,8 @@ export class Auth {
 
     }
 
-    public static tokenResponse(user:any){
-        let userDef:any, payload, groups:Array<string>=[], timeout:string=tokenTimeout || '10s';
+    static tokenResponse(user){
+        let userDef, payload, groups=[], timeout=tokenTimeout || '10s';
 
         user  = user || {};
         userDef = {};
@@ -77,7 +77,7 @@ export class Auth {
 
         //filtra os grupos do usuÃ¡rio, retornando somente os que comeÃ§am com o nome da aplicaÃ§Ã£o ele
         //removendo os grupos de negaÃ§Ã£o ex: APPNAME!GRUPONEGADO
-        (userDef.memberOf || []).forEach((b:string)=>{
+        (userDef.memberOf || []).forEach((b)=>{
             let s = b.substring(0, appId.length);
             if (s == appId && b.split('!').length==1){
                 groups.push(b);
@@ -99,27 +99,27 @@ export class Auth {
         };
     }
 
-    public static isAuthenticated(req:any, res:any, server:any, next:Function){
-        let i, xx, device, options:any, token:string, parts:[string], requestRoute:string[], publicRoute:string[], publicMethod:string, requestMethod:string;
+    static isAuthenticated(req, res, server, next){
+        let i, xx, device, options, token, parts, requestRoute, publicRoute, publicMethod, requestMethod;
     
         requestRoute  = req.originalUrl.split('/');
         requestMethod = req.method;
-        token         = (<any>req.headers).authorization || req.body.Authorization;
-        device        = req.query.Device || (<any>req.headers).device;
+        token         = req.headers.authorization || req.body.Authorization;
+        device        = req.query.Device || req.headers.device;
 
         res.send(401, 'invalid token');
 
         // (<any>req).memberOf = {};
 
-        // this.tokenValidate(token).then((data:any)=>{
+        // this.tokenValidate(token).then((data)=>{
         //     //converte memberOf de array para objeto.
-        //     data.memberOf.forEach((item:any)=>{
+        //     data.memberOf.forEach((item)=>{
         //         (<any>req).memberOf[item] = true;
         //     });
             
         //     next();
     
-        // }).catch((err:any)=>{
+        // }).catch((err)=>{
         //     //err.token contém o token analisado
         //     //se o token expirou...
         //     return res.error(err);
@@ -133,3 +133,5 @@ export class Auth {
     }
 
 }
+
+exports.Auth = Auth

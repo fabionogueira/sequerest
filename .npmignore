@@ -1,9 +1,6 @@
 .vscode
-dev
-public
-src
+node_modules
 test
-mydb.json
+.getignore
+.npmignore
 package-lock.json
-tsconfig.dev.json
-tsconfig.prod.json

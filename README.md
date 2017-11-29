@@ -52,10 +52,7 @@ rest.Server
 node main.js
 ```
 
-* list of registered api: http://localhost:8080/
-
-* Create POST http://localhost:8080/api/person/ raw json {"name":"my name"}
-* Read GET http://localhost:8080/api/person/
-* Read GET http://localhost:8080/api/person/1
-* Update PUT http://localhost:8080/api/person/1 raw json {"name":"name changed"}
-* Delete DELETE http://localhost:8080/api/person/1
+# list of registered api
+```bash
+http://localhost:8080/
+```

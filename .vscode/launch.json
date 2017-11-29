@@ -8,9 +8,16 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Run Server",
-            "program": "${workspaceRoot}/dev/index.js",
-            "cwd": "${workspaceRoot}/dev"
+            "name": "Sequelize Server",
+            "program": "${workspaceRoot}/test/sequelize/main.js",
+            "cwd": "${workspaceRoot}/test/sequelize"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "JSON Server",
+            "program": "${workspaceRoot}/test/json/main.js",
+            "cwd": "${workspaceRoot}/test/json"
         },
         {
             "type": "node",

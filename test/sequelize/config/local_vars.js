@@ -20,7 +20,7 @@ exports.database = {
     },
 
     // SQLite only
-    "storage": "./mydb.sqlite"
+    "storage": __dirname + "/../mydb.sqlite"
 }
 
 exports.device = false;

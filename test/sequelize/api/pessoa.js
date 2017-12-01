@@ -1,6 +1,6 @@
 const {User} = require('../models')
 
-exports.pessoa = {
+module.exports = {
     auth: true,
     model: User
 }

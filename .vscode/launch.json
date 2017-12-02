@@ -9,15 +9,15 @@
             "type": "node",
             "request": "launch",
             "name": "Sequelize Server",
-            "program": "${workspaceRoot}/test/sequelize/main.js",
-            "cwd": "${workspaceRoot}/test/sequelize"
+            "program": "${workspaceRoot}/example/sequelize/main.js",
+            "cwd": "${workspaceRoot}/example/sequelize"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "JSON Server",
-            "program": "${workspaceRoot}/test/json/main.js",
-            "cwd": "${workspaceRoot}/test/json"
+            "program": "${workspaceRoot}/example/json/main.js",
+            "cwd": "${workspaceRoot}/example/json"
         },
         {
             "type": "node",

@@ -1,4 +1,4 @@
-const server = require('../../src/server');
+const server = require('../../../src/server/server');
 const config = require('./config');
 const pessoa = require('./api/pessoa.js');
 

@@ -1,5 +1,5 @@
+const server = require('../../../src/server/server');
 const config = require('./config/local_vars');
-const server = require('../../src/server');
 const pessoa = require('./api/pessoa');
 
 server

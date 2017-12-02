@@ -1,11 +1,11 @@
-const Auth = require('./auth');
-const Database = require('./database');
-const Server = require('./server');
-const Validator = require('./validator');
+const auth = require('./auth');
+const database = require('./database');
+const server = require('./server');
+const validator = require('./validator');
 
 module.exports = {
-    Auth,
-    Database,
-    Server,
-    Validator
+    auth,
+    database,
+    server,
+    validator
 };

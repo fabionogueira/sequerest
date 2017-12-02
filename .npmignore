@@ -1,6 +1,8 @@
 .vscode
+example
 node_modules
-test
-.getignore
+.gitignore
+.jshintrc
 .npmignore
+jsconfig.json
 package-lock.json

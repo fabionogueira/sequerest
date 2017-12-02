@@ -1,6 +1,6 @@
-const {User} = require('../models')
+const {User} = require('../models');
 
 module.exports = {
     auth: true,
     model: User
-}
+};

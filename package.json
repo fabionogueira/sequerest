@@ -2,7 +2,7 @@
   "name": "api-rest",
   "version": "0.0.8",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/",
   "repository": {
     "type": "git",
     "url": "https://github.com/fabionogueira/api-rest.git"
@@ -40,6 +40,7 @@
     "@types/md5": "^2.1.32",
     "copy-webpack-plugin": "^4.0.1",
     "get-node_modules": "^0.1.2",
+    "jshint": "^2.9.5",
     "on-build-webpack": "^0.1.0",
     "reload-server-webpack-plugin": "^1.0.1",
     "source-map-loader": "^0.1.6",
@@ -55,6 +56,5 @@
     "webpack-obfuscator": "^0.9.1",
     "webpack-shell-plugin": "^0.5.0"
   },
-  "scripts": {
-  }
+  "scripts": {}
 }

@@ -5,7 +5,7 @@
  * @type <middleware>express.js
  * @example express.use(cors);
  */
-function cors(req, res, next) {
+module.exports = function cors(req, res, next) {
     let oneof = false;
     if(req.headers.origin) {
         res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -30,5 +30,3 @@ function cors(req, res, next) {
         next();
     }
 };
-
-exports.cors = cors

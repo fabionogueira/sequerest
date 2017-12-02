@@ -1,11 +1,8 @@
-const fs = require('fs')
-const path = require('path')
-
-// let FILE:string = `${path.dirname(process.argv[1])}/db.json`;
+const fs = require('fs');
 
 let instance = {};
 
-class Database{
+module.exports = class Database{
     
     constructor(filename){
         let json;
@@ -13,8 +10,8 @@ class Database{
         this._transaction = false;
         this._rowsPending = [];
         this._dbdata = [];
-        this._dbid;
-        this._filename;
+        this._dbid = null;
+        this._filename = null;
 
         // Arquivo local JSON
         if (instance[filename]){
@@ -150,6 +147,4 @@ class Database{
         content = `{"id":${this._dbid}, "rows":${JSON.stringify(this._dbdata)}}`;
         fs.writeFileSync(this._filename, content);
     }
-}
-
-exports.Database = Database;
+};

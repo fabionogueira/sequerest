@@ -1,5 +1,5 @@
-const Sequelize = require('sequelize')
-const config = require('./local_vars')
+const Sequelize = require('sequelize');
+const config = require('./local_vars');
 
 const DB = new Sequelize(
     config.database.name,
@@ -8,5 +8,7 @@ const DB = new Sequelize(
     config.database
 );
 
-exports.DB = DB;
-exports.Sequelize = Sequelize;
+module.exports = {
+    DB,
+    Sequelize
+};

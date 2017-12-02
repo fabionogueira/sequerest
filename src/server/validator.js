@@ -21,24 +21,23 @@ class Validator {
 
 Validator.set('max_length', (value, erros, def, name) => {
     let verbose = Validator.getVerbose(name, def);
-    if (value && (value.length > def.max_length)) erros.push(`the [${verbose}] field is too large`)
+    if (value && (value.length > def.max_length)) erros.push(`the [${verbose}] field is too large`);
 });
 
 Validator.set('null', (value, erros, def, name) => {
     let verbose = Validator.getVerbose(name, def);
-    if (value === '' || value === undefined || value === null) erros.push(`the [${verbose}] field is required`)
+    if (value === '' || value === undefined || value === null) erros.push(`the [${verbose}] field is required`);
 });
 
 Validator.set('type', (value, erros, def, name) => {
     let verbose = Validator.getVerbose(name, def);
-    let type = Object.prototype.toString.call(value).replace('[object ', '').replace(']', '').toLowerCase()
+    let type = Object.prototype.toString.call(value).replace('[object ', '').replace(']', '').toLowerCase();
     if (type === null || type === undefined) return;
-    if (type != def.type) erros.push(`the [${verbose}] data type field must be of type ${def.type}`)
+    if (type != def.type) erros.push(`the [${verbose}] data type field must be of type ${def.type}`);
 });
 
-Validator.set('default', (value, erros, def, name) => {
+Validator.set('default', (value, erros, def) => {
     return (value === undefined || value === null || value === '') ? def.default : value;
 });
 
-
-exports.Validator = Validator
+module.exports = Validator;

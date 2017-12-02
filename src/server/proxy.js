@@ -32,12 +32,11 @@
  *      }
 */
 
-const request = require("request")
-const md5 = require("md5")
+const request = require("request");
 
-let _conf = {}
+let _conf = {};
 
-class Proxy {
+module.exports = class Proxy {
 
     static config(config, app){
         let self = this;
@@ -46,13 +45,13 @@ class Proxy {
 
         if (config){
             app.post('/api/proxy/', (req, res) => {
-                self.proxy(req, res)
+                self.proxy(req, res);
             });
         }
     }
 
     static proxy(req, res){
-        let i, j, json, cacheId, fileCache, 
+        let json,
             r = _conf[req.body.target],
             data = req.body.data;
         
@@ -61,28 +60,24 @@ class Proxy {
         }
     
         json = typeof(r.request)=='function' ? r.request(data || {}) : (data || r.request);
-        process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         
-        request({
-            url    : r.url, 
-            method : r.method, 
-            json   : json,
-            qs     : r.method=='GET' ? json : null, 
-            headers: r.headers
-        }, complete);
-    
-        function complete(err, response, cache){
+        function doResponseSuccess(payload){
+            res.status(200).json(payload);
+        }
+
+        function complete(err, response){
             if (err){
                 if (r.response){
                     return r.response(err, null, (error, payload)=>{
                         if (error){
-                            res.status(500).json(error)
+                            res.status(500).json(error);
                         }else{
                             doResponseSuccess(payload);
                         }
                     });
                 }else{
-                    return res.status(500).json(err)
+                    return res.status(500).json(err);
                 }
             }
     
@@ -93,20 +88,22 @@ class Proxy {
             if (r.response){
                 return r.response(null, response, (error, payload)=>{
                     if (error){
-                        res.status(500).json(error)
+                        res.status(500).json(error);
                     }else{
                         doResponseSuccess(payload);
                     }
                 });
             }else{
                 doResponseSuccess(response);
-            }
-    
-            function doResponseSuccess(payload){
-                res.status(200).json(payload);
-            }
+            }            
         }
+
+        request({
+            url    : r.url, 
+            method : r.method, 
+            json   : json,
+            qs     : r.method=='GET' ? json : null, 
+            headers: r.headers
+        }, complete);
     }
 }
-
-exports.Proxy = Proxy

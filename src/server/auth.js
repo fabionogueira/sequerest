@@ -4,24 +4,16 @@
  * @version 1.0.0
  */
 
-const jwt = require("jsonwebtoken")
-const md5 = require("md5")
+const jwt = require("jsonwebtoken");
 
 let publicKey; 
 let privateKey;
 let appId;
 let ldapId; 
 let tokenTimeout;
-let LDAP_CONFIG;
 let tokensPath = './';
-let tokenRefreshTM = (new Date()).getTime();
-let userDev = {
-    username:'',
-    password:'',
-    definition:{}
-};
 
-class Auth {
+module.exports = class Auth {
     static config(options){
         tokenTimeout = options.tokenTimeout;
         appId        = options.appId;
@@ -99,8 +91,8 @@ class Auth {
         };
     }
 
-    static isAuthenticated(req, res, server, next){
-        let i, xx, device, options, token, parts, requestRoute, publicRoute, publicMethod, requestMethod;
+    static isAuthenticated(req, res){
+        let device, token, requestRoute, requestMethod;
     
         requestRoute  = req.originalUrl.split('/');
         requestMethod = req.method;
@@ -132,6 +124,4 @@ class Auth {
         
     }
 
-}
-
-exports.Auth = Auth
+};

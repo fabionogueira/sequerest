@@ -2,7 +2,7 @@
   "name": "api-rest",
   "version": "0.0.9",
   "description": "",
-  "main": "src/",
+  "main": "src/server/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/fabionogueira/api-rest.git"
@@ -41,6 +41,7 @@
     "copy-webpack-plugin": "^4.0.1",
     "get-node_modules": "^0.1.2",
     "jshint": "^2.9.5",
+    "nodemon": "^1.14.5",
     "on-build-webpack": "^0.1.0",
     "reload-server-webpack-plugin": "^1.0.1",
     "source-map-loader": "^0.1.6",
@@ -54,7 +55,10 @@
     "webpack-cleanup-plugin": "^0.4.2",
     "webpack-dev-server": "^2.3.0",
     "webpack-obfuscator": "^0.9.1",
-    "webpack-shell-plugin": "^0.5.0"
+    "webpack-shell-plugin": "^0.5.0",
+    "webpack-watch-server": "^1.2.1"
   },
-  "scripts": {}
+  "scripts": {
+    "dev:server": "nodemon example/server/json/main.js -V --watch src --watch example/server/json"
+  }
 }

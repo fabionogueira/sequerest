@@ -2,7 +2,7 @@ const database = require('../../../src/server/database');
 
 module.exports = {
     port : 8080,
-    public : '/home/fabio/node-rest-server/test/json/public',
+    public : `${__dirname}/public`,
     root : '/api',
-    database : new database('./mydb.json')
+    database : new database(`${__dirname}/mydb.json`)
 };

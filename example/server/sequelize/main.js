@@ -1,11 +1,11 @@
-const server = require('../../../src/server/server');
+const node_rest = require('../../../src/server/index');
 const config = require('./config/local_vars');
-const pessoa = require('./api/pessoa');
+const person = require('./api/person');
 
-server
+node_rest.server
     .config(config)
-    
-    .route('/api/pessoa/', pessoa)
+
+    .route('/api/person/', person)
 //    .route(auth)
     .route('/path/to/api', 'get', (req, res)=>{
         res.send('ok');

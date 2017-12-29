@@ -1,3 +1,5 @@
+import { method } from '../../../.cache/typescript/2.6/node_modules/@types/bluebird/index';
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const validator = require('./validator');
@@ -9,8 +11,71 @@ let _started = false;
 let _registeredRouters = [];
 let _conf = null;
 
+const DEFAULT_API = {
+    methods: ['get', 'post', 'put', 'delete'],   // opcional default ALL, métodos permitidos para esta API
+    permissions: [],          // opcional default [], regras de permissões para esta API
+    proxy: null,              // opcional se o model for definido, default null
+    model: null,              // opcional se o proxy for definido, default null
+    request_get: {            // opcional default function se methods contém GET, objeto ou função a ser chamada quando ouver uma requisição GET
+        permissions: [],      // opcional default null, regras de permissões específicas para o GET
+        model: null,          // opcional default null, model específico para o GET
+        callback: null        // opcional default function se methods contém GET
+    },
+    request_post: null,       // mesmas regras do request_get aplicado ao método POST
+    request_put: null,        // mesmas regras do request_get aplicado ao método PUT
+    request_delete: null      // mesmas regras do request_get aplicado ao método DELETE
+}
+
 function routeJSON(definition) {
     definition.id = definition.id || 'id';
+
+    return {
+        // Read
+        get(req, res){
+            res.status(200).json( definition.model.read(req.params.id) || [] );
+        },
+
+        // Create
+        post(req, res){
+            let data = definition.getData(req.body);
+            
+            if (data.error) {
+                return res.status(400).json(data.errors);
+            }
+    
+            res.status(201).json( definition.model.create(data) );
+        },
+
+        // Update
+        put(req, res){
+            let data = definition.getData(req.body);
+            
+            if (!req.params[definition.id]) {
+                return res.status(400).json([definition.id + ' is required']);
+            }
+    
+            if (data.error) {
+                return res.status(400).json(data.errors);
+            }
+    
+            res.status(200).json( definition.model.update(req.params.id, data) );
+        },
+
+        // Delete
+        delete(req, res){
+            let count;
+            
+            // if (!req.params[definition.id]) {
+            //     return res.status(400).json([definition.id + ' is required']);
+            // }
+    
+            if ( definition.model.delete(req.params.id) > 0) {
+                res.status(204).json();
+            } else {
+                res.status(404).json(['not found']);
+            }
+        }
+    }
 
     definition.getData = definition.getData || function (data) {
         let fieldName, fieldModelDef, fieldModelItem, validate, newValue;
@@ -46,53 +111,6 @@ function routeJSON(definition) {
         }
 
         return data;
-    };
-
-    definition.create = definition.create || function (req, res) {
-        let data = definition.getData(req.body);
-
-        if (data.error) {
-            return res.status(400).json(data.errors);
-        }
-
-        data = definition.database ? definition.database.create(data) : {};
-        res.status(201).json(data);
-    };
-
-    definition.read = definition.read || function (req, res) {
-        let data = definition.database ? definition.database.read(req.params.id) : [];
-        res.status(200).json(data);
-    };
-
-    definition.update = definition.update || function (req, res) {
-        let data = definition.getData(req.body);
-
-        if (!req.params[definition.id]) {
-            return res.status(400).json([definition.id + ' is required']);
-        }
-
-        if (data.error) {
-            return res.status(400).json(data.errors);
-        }
-
-        data = definition.database ? definition.database.update(req.params.id, data) : {};
-        res.status(200).json(data);
-    };
-
-    definition.delete = definition.delete || function (req, res) {
-        let count;
-
-        if (!req.params[definition.id]) {
-            return res.status(400).json([definition.id + ' is required']);
-        }
-
-        count = definition.database ? definition.database.delete(req.params.id) : 0;
-
-        if (count > 0) {
-            res.status(204).json();
-        } else {
-            res.status(404).json(['not found']);
-        }
     };
 }
 
@@ -268,84 +286,90 @@ module.exports = class Server {
         return _registeredRouters;
     }
 
-    static route(pathname, method = null, definition = null) {
-        let path, a;
+    static route(pathname, definition) {
+        let path, a, crud;
 
-        if (typeof (pathname) == 'string') {
-            pathname = normalizePath(pathname);
-        }
-
-        // ("/api/path/", "get", function(){})
-        if (arguments.length == 3) {
-            _registeredRouters.push({
-                pathname: pathname,
-                method: method
-            });
-            app[method](pathname, definition);
-        }
-
-        // ("/api/path/", {database:null, model:null})
-        if (arguments.length == 2) {
-            if (definition === null) {
-                definition = method;
-            }
-
-            if (definition.model && definition.model.sequelize) {
+        definition = Object.assign({}, DEFAULT_API, definition);
+        
+        if (definition.model){
+            if (definition.model.sequelize){
                 routeSequelize(definition);
             } else {
-                routeJSON(definition);
+                crud = routeJSON(definition);
             }
+        } else {
 
-            _registeredRouters.push({
-                pathname: pathname,
-                method: 'get'
-            });
-            _registeredRouters.push({
-                pathname: pathname + ':id',
-                method: 'get'
-            });
-            _registeredRouters.push({
-                pathname: pathname,
-                method: 'post'
-            });
-            _registeredRouters.push({
-                pathname: pathname + ':id',
-                method: 'put'
-            });
-            _registeredRouters.push({
-                pathname: pathname + ':id',
-                method: 'delete'
-            });
-
-            app.get(pathname, definition.read);
-            app.get(pathname + (definition.readParams || ':id'), definition.read);
-            app.post(pathname, definition.create);
-            app.put(pathname + (definition.readParams || ':id'), definition.update);
-            app.delete(pathname + (definition.readParams || ':id'), definition.delete);
         }
+
+        definition.methods.forEach(method=>{
+            let m = definition['request_'+method];
+
+            if (m){
+                if (typeof m == 'function'){
+                    m = {
+                        callback: m
+                    };
+                }
+
+                
+            }
+        })
+        // app.get(pathname, definition.read);
+        // app.get(pathname + (definition.readParams || ':id'), definition.read);
+        // app.post(pathname, definition.create);
+        // app.put(pathname + (definition.readParams || ':id'), definition.update);
+        // app.delete(pathname + (definition.readParams || ':id'), definition.delete);
+
+
+        // _registeredRouters.push({
+        //     pathname: pathname,
+        //     method: 'get'
+        // });
+        // _registeredRouters.push({
+        //     pathname: pathname + ':id',
+        //     method: 'get'
+        // });
+        // _registeredRouters.push({
+        //     pathname: pathname,
+        //     method: 'post'
+        // });
+        // _registeredRouters.push({
+        //     pathname: pathname + ':id',
+        //     method: 'put'
+        // });
+        // _registeredRouters.push({
+        //     pathname: pathname + ':id',
+        //     method: 'delete'
+        // });
+
+        // app.get(pathname, definition.read);
+        // app.get(pathname + (definition.readParams || ':id'), definition.read);
+        // app.post(pathname, definition.create);
+        // app.put(pathname + (definition.readParams || ':id'), definition.update);
+        // app.delete(pathname + (definition.readParams || ':id'), definition.delete);
 
         // ({})
-        if (arguments.length == 1) {
-            definition = pathname;
-            if (definition.routers) {
-                for (path in definition.routers) {
-                    a = path.split(' ');
-                    if (a.length == 1) {
-                        a[1] = a[0];
-                        a[0] = 'get';
-                    }
+        // if (arguments.length == 1) {
+        //     definition = pathname;
+        //     if (definition.routers) {
+        //         for (path in definition.routers) {
+        //             a = path.split(' ');
+        //             if (a.length == 1) {
+        //                 a[1] = a[0];
+        //                 a[0] = 'get';
+        //             }
 
-                    a[0] = a[0].toLowerCase();
-                    a[1] = normalizePath(a[1]);
+        //             a[0] = a[0].toLowerCase();
+        //             a[1] = normalizePath(a[1]);
 
-                    _registeredRouters.push({
-                        pathname: a[1],
-                        method: a[0]
-                    });
-                    app[a[0]](a[1], definition.routers[path]);
-                }
-            }
-        }
+        //             _registeredRouters.push({
+        //                 pathname: a[1],
+        //                 method: a[0]
+        //             });
+        //             app[a[0]](a[1], definition.routers[path]);
+        //         }
+        //     }
+        // }
 
         return this;
     }

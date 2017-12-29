@@ -1,13 +1,8 @@
-const server = require('../../../src/server/server');
+const api = require('../../../src/server/index');
 const config = require('./config');
-const pessoa = require('./api/pessoa.js');
+const person = require('./api/person');
 
-server.config(config);
-
-server.route('/api/pessoa', pessoa);
-
-server.route('/path/to/api', 'get', (req, res)=>{
-    res.send('ok');
-});
-
-server.start();
+api.server
+    .config(config)
+    .route('/api/person', person)
+    .start();

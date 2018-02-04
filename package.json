@@ -59,6 +59,6 @@
     "webpack-watch-server": "^1.2.1"
   },
   "scripts": {
-    "dev:server": "nodemon example/server/json/main.js -V --watch src --watch example/server/json"
+    "test": "nodemon example/main.js -V --watch src --watch example/"
   }
 }

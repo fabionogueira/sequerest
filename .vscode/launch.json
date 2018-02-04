@@ -8,27 +8,20 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Sequelize Server",
-            "program": "${workspaceRoot}/example/sequelize/main.js",
-            "cwd": "${workspaceRoot}/example/sequelize"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "JSON Server",
-            "program": "${workspaceRoot}/example/json/main.js",
-            "cwd": "${workspaceRoot}/example/json"
+            "name": "node",
+            "program": "${workspaceRoot}/example/main.js",
+            "cwd": "${workspaceRoot}/example/"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Nodemon Launch Server",
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceRoot}/example/",
             "runtimeExecutable": "nodemon",
             "runtimeArgs": [
                 "--inspect=5858"
             ],
-            "program": "${workspaceRoot}/test/main.js",
+            "program": "${workspaceRoot}/example/main.js",
             "restart": true,
             "port": 5858,
             "console": "integratedTerminal",

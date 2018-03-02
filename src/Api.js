@@ -1,22 +1,26 @@
-class ModelViewSet {
-    constructor(DB, Sequelize){
-        // this._fields = this.fields(Sequelize);
-        // this._alias = `model_${(modelIndex++)}`;
-        // this._model = DB.define(this._alias, this._fields);
-    }
+class Api {
 
-    static __init__(req){
+    constructor(sqModel){
+        this._sqModel = sqModel;
+        this._primaryKeys = {};
+
+        Object.keys(sqModel.attributes).forEach(field => {
+            if (sqModel.attributes[field].primaryKey){
+                this._primaryKeys[field] = true;
+            }
+        });
+    }
+    __request__(req){
         let n;
         let keys = this._primaryKeys;
-
-        this._model = this.getModel();
-
-        if (!this._model){
-            return;
+        let sqModel = this.getModel();
+        
+        if (!sqModel){
+            return this;
         }
 
         this._filters = undefined;
-        this._fields = this._model.attributes;
+        this._fields = sqModel.attributes;
         this._keyFilters = undefined;
         this._data = req.body;
         
@@ -41,11 +45,19 @@ class ModelViewSet {
         return this;
     }
 
-    static getData(){
-        return this._data;
+    getData(withKeys = true){
+        return withKeys ? this._data : this.getDataWithoutKey();
     }
 
-    static getDataWithoutKey() {
+    getFilters(){
+        return this._filters;
+    }
+
+    getKeyFilters(){
+        return this._keyFilters;
+    }
+
+    getDataWithoutKey() {
         let n;
         let keys = this._primaryKeys;
         let data = Object.assign({}, this._data);
@@ -57,39 +69,19 @@ class ModelViewSet {
         return data;
     }
 
-    static getFilters(){
-        return this._filters;
+    getModel(){
+        return this._sqModel;
     }
 
-    static getKeyFilters(){
-        return this._keyFilters;
-    }
+    create(res) {
+        var sqModel = this.getModel();
+        var data = this.getData();
 
-    static setModel(model){
-        let att;
-
-        this._primaryKeys = {};
-        this._model = model;
-
-        if (model){
-            for (att in model.attributes){
-                if (model.attributes[att].primaryKey){
-                    this._primaryKeys[att] = true;
-                }
-            }
-        }
-    }
-
-    static getModel(){
-        return this._model;
-    }
-
-    static create(res) {
-        if (!this._model){
+        if (!sqModel){
             return res.status(200).json({create:'model not defined'});
         }
 
-        this._model.create(this.getData())
+        sqModel.create(data)
             .then(record => {
                 res.status(200).json(record);
             })
@@ -100,12 +92,14 @@ class ModelViewSet {
             });
     }
 
-    static read(res) {
-        if (!this._model){
+    read(res) {
+        var sqModel = this.getModel();
+
+        if (!sqModel){
             return res.status(200).json({read:'model not defined'});
         }
-
-        this._model.findAll(this.getKeyFilters())
+        
+        sqModel.findAll(this.getKeyFilters())
             .then(list => {
                 res.status(200).json(list);
             })
@@ -116,16 +110,15 @@ class ModelViewSet {
             });
     }
 
-    static update(res) {
-        let data;
+    update(res) {
+        var sqModel = this.getModel();
+        var data = this.getDataWithoutKey();
 
-        if (!this._model){
+        if (!sqModel){
             return res.status(200).json({update:'model not defined'});
         }
 
-        data = this.getDataWithoutKey();
-
-        this._model.update(data, this.getKeyFilters())
+        sqModel.update(data, this.getKeyFilters())
             .then(count => {
                 if (count > 0) {
                     res.status(200).json(data);
@@ -140,12 +133,15 @@ class ModelViewSet {
             });
     }
 
-    static delete(res) {
-        if (!this._model){
+    delete(res) {
+        var sqModel = this.getModel();
+        var keyFilters = this.getKeyFilters();
+
+        if (!this._sqModel){
             return res.status(200).json({delete:'model not defined'});
         }
 
-        this._model.destroy(this.getKeyFilters())
+        sqModel.destroy(keyFilters)
             .then(count => {
                 if (count > 0) {
                     res.status(204).json();
@@ -161,4 +157,4 @@ class ModelViewSet {
     }
 }
 
-module.exports = ModelViewSet;
+module.exports = Api;

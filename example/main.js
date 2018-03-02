@@ -1,14 +1,22 @@
-const node_rest = require('../src/server/index');
-const config = require('./config/local_vars');
+// example by: https://lorenstewart.me/2016/09/12/sequelize-table-associations-joins/
 
-const {UserViewSet, CustomViewSet} = require('./views');
+const node_rest = require('../src/index');
 
-node_rest.server
-    .config(config)
+const env = require('./config/env');
+const db = require('./config/db');
+const UserApi = require('./apis/UserApi');
 
-    .route('/api/user/', UserViewSet)
+node_rest.server.config(env)
+    .route('/api/user/', UserApi);
 
-//    .route(auth)
-    .route('/path/to/api', CustomViewSet)
+// sincroniza o banco de dados
+db.sync(() => {
 
-    .start();
+    // insere os dados iniciais
+    if (env.NODE_ENV == 'development') {
+        // db.createData();
+    }
+
+    // inicializa o servidor
+    node_rest.server.start();
+});

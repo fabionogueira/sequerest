@@ -3,6 +3,7 @@
     "undef": true,
     "unused": true,
     "latedef": true,
+    "indent": 4,
     "globals": {
         "require": true,
         "module": true,

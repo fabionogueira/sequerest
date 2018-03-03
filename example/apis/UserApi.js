@@ -1,15 +1,16 @@
-const Api = require('../../src/Api');
+const Api = require('../../src/api');
 const db = require('../config/db');
 
 class UserApi extends Api {
     read(res) {
         let sqModel = this.getModel();
         let options = this.getKeyFilters() || {};
+        let models = db.getModels();
 
         options.include = [{
-            model: db.posts,
+            model: models.posts,
             include: [{
-                model: db.comments
+                model: models.comments
             }]
         }];
 
@@ -26,14 +27,14 @@ class UserApi extends Api {
                             //tidy up the post data
                             return Object.assign({}, {
                                 post_id: post.id,
-                                user_id: post.user_id,
+                                // user_id: post.user_id,
                                 content: post.content,
                                 comments: post.comments.map(comment => {
 
                                     //tidy up the comment data
                                     return Object.assign({}, {
                                         comment_id: comment.id,
-                                        post_id: comment.post_id,
+                                        // post_id: comment.post_id,
                                         commenter: comment.commenter_username,
                                         commenter_email: comment.commenter_email,
                                         content: comment.content
@@ -48,7 +49,7 @@ class UserApi extends Api {
             })
             .catch(error => {
                 res.status(500).json({
-                    error: error.original.code
+                    error: error.message
                 });
             });
     }

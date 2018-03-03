@@ -16,8 +16,8 @@ const CONFIG = {
         CORS: true,
         PORT: '8080',
         PUBLIC: '/home/fabio/public',
-        DATABASE_DIALECT: "sqlite",
         DATABASE_OPTIONS: {
+            dialect: "sqlite",
             storage: ":memory:",
             define: {
                 underscored: true
@@ -28,12 +28,12 @@ const CONFIG = {
         CORS: true,
         PORT: '8080',
         PUBLIC: '/public',
-        DATABASE_DIALECT: 'mysql',
-        DATABASE_USERNAME: process.env.DATABASE_USERNAME,
-        DATABASE_PASSWORD: process.env.DB_PASSWORD,
-        DATABASE_NAME: process.env.DATABASE_NAME,
-        DATABASE_HOST: process.env.DATABASE_HOST,
         DATABASE_OPTIONS: {
+            USERNAME: process.env.DATABASE_USERNAME,
+            PASSWORD: process.env.DB_PASSWORD,
+            NAME: process.env.DATABASE_NAME,
+            HOST: process.env.DATABASE_HOST,
+            dialect: 'mysql',
             define: {
                 underscored: true
             }
@@ -43,9 +43,5 @@ const CONFIG = {
 
 const CONFIG_ENV = CONFIG[NODE_ENV];
 CONFIG_ENV.NODE_ENV = NODE_ENV;
-
-if (NODE_ENV == 'development'){
-    console.log('database:', CONFIG_ENV.DATABASE_STORAGE);
-}
 
 module.exports = CONFIG_ENV;

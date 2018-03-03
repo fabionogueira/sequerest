@@ -74,8 +74,8 @@ class Api {
     }
 
     create(res) {
-        var sqModel = this.getModel();
-        var data = this.getData();
+        let sqModel = this.getModel();
+        let data = this.getData();
 
         if (!sqModel){
             return res.status(200).json({create:'model not defined'});
@@ -93,7 +93,7 @@ class Api {
     }
 
     read(res) {
-        var sqModel = this.getModel();
+        let sqModel = this.getModel();
 
         if (!sqModel){
             return res.status(200).json({read:'model not defined'});
@@ -111,8 +111,8 @@ class Api {
     }
 
     update(res) {
-        var sqModel = this.getModel();
-        var data = this.getDataWithoutKey();
+        let sqModel = this.getModel();
+        let data = this.getDataWithoutKey();
 
         if (!sqModel){
             return res.status(200).json({update:'model not defined'});
@@ -134,8 +134,8 @@ class Api {
     }
 
     delete(res) {
-        var sqModel = this.getModel();
-        var keyFilters = this.getKeyFilters();
+        let sqModel = this.getModel();
+        let keyFilters = this.getKeyFilters();
 
         if (!this._sqModel){
             return res.status(200).json({delete:'model not defined'});

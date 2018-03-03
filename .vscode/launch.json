@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "name": "node",
-            "program": "${workspaceRoot}/example/main.js",
+            "program": "${workspaceRoot}/example/server.js",
             "cwd": "${workspaceRoot}/example/"
         },
         {

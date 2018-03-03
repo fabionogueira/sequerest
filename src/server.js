@@ -2,8 +2,9 @@
 const Sequelize = require('sequelize');
 const express = require('express');
 const bodyParser = require('body-parser');
-const Model = require('./Model');
-const Api = require('./Api');
+
+const Model = require('./model');
+const Api = require('./api');
 const cors = require('./cors');
 const proxy = require('./proxy');
 const app = express();
@@ -26,7 +27,7 @@ module.exports = class Server {
      *          password: '',
      *          // check options: http://docs.sequelizejs.com/manual/installation/usage.html
      *      },
-     *      proxy: {
+     *      PROXY: {
      *          "test-proxy": {
      *              // required
      *              "url": "https://code.jquery.com/jquery-3.2.1.js",
@@ -129,7 +130,7 @@ module.exports = class Server {
 
         // PUT: update
         app.put(item.pathname + params, (req, res) => {
-            api.__request__(req).updated(res);
+            api.__request__(req).update(res);
         });
         
         // DELETE: delete
@@ -157,7 +158,8 @@ module.exports = class Server {
         let routers = Server.getRouters();
     
         routers.forEach(item => {
-            list += (`<p>${item.method.toUpperCase()} ${item.pathname}</p>`);
+            console.log(item);
+            list += (`<p>[${item.method.join(', ')}] ${item.pathname}</p>`);
         });
     
         html =

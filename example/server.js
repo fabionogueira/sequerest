@@ -2,6 +2,7 @@ const server = require('../src/server');
 
 const env = require('./config/env');
 
+const AuthApi = require('./apis/AuthApi');
 const UserApi = require('./apis/UserApi');
 const PostApi = require('./apis/PostApi');
 const CommentApi = require('./apis/CommentApi');
@@ -11,6 +12,7 @@ server
     .config(env)
 
     // define as rotas
+    .route('/api/auth/', AuthApi, false)
     .route('/api/user/', UserApi)
     .route('/api/post/', PostApi)
     .route('/api/comment/', CommentApi)

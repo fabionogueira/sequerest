@@ -1,12 +1,18 @@
-// import { method } from '../../../.cache/typescript/2.6/node_modules/@types/bluebird/index';
+/** 
+ * @file server.js
+ * @author Fabio Nogueira <fabio.bacabal@gmail.com>
+*/
+
 const Sequelize = require('sequelize');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const Model = require('./model');
+const Model = require('./lib/model');
+const cors = require('./lib/cors');
+const proxy = require('./lib/proxy');
+
 const Api = require('./api');
-const cors = require('./cors');
-const proxy = require('./proxy');
+
 const app = express();
 
 let _started = false;
@@ -96,11 +102,22 @@ module.exports = class Server {
     }
 
     static registerApiRouter(item){
-        let att;
+        let att, method, k;
         let params = '';
         let api = item.apiInstance;
 
         if (!(api instanceof Api)){
+            return;
+        }
+        
+        Object.getOwnPropertyNames(api.__proto__).forEach(k => {
+            method = k.split('_')[0];
+            if (method && 'get,post,put,delete'.includes(method)){
+                createRouter(method, item.pathname, k, api, item);
+            }
+        });
+
+        if (!item.registerCrud){
             return;
         }
 
@@ -111,42 +128,22 @@ module.exports = class Server {
             params = ':id/';
         }
 
-        item.method = ['GET', 'POST', 'PUT', 'DELETE'];
-
-        // GET: read all
-        app.get(item.pathname, (req, res) => {
-            api.__request__(req).read(res);
-        });
-        
-        // GET: read filtered
-        app.get(item.pathname + params, (req, res) => {
-            api.__request__(req).read(res);
-        });
-
-        // POST: create
-        app.post(item.pathname, (req, res) => {
-            api.__request__(req).create(res);
-        });
-
-        // PUT: update
-        app.put(item.pathname + params, (req, res) => {
-            api.__request__(req).update(res);
-        });
-        
-        // DELETE: delete
-        app.delete(item.pathname + params, (req, res) => {
-            api.__request__(req).delete(res);
-        });
+        createRouter('get', item.pathname, 'read', api, item); // GET: read all
+        createRouter('get', item.pathname + params, 'read', api, item); // GET: read filtered
+        createRouter('post', item.pathname, 'create', api, item); // POST: create
+        createRouter('put', item.pathname + params, 'update', api, item); // PUT: update
+        createRouter('delete', item.pathname + params, 'delete', api, item); // DELETE: delete
     }
 
     static getRouters() {
         return _registeredRouters;
     }
 
-    static route(pathname, apiInstance) {
+    static route(pathname, apiInstance, registerCrud = true) {
         _registeredRouters.push({
             pathname: `${pathname}/`.replace('//', '/') ,
-            apiInstance: apiInstance
+            apiInstance,
+            registerCrud
         });
 
         return this;
@@ -158,7 +155,6 @@ module.exports = class Server {
         let routers = Server.getRouters();
     
         routers.forEach(item => {
-            console.log(item);
             list += (`<p>[${item.method.join(', ')}] ${item.pathname}</p>`);
         });
     
@@ -173,3 +169,22 @@ module.exports = class Server {
         res.status(200).send(html);
     }
 };
+
+function createRouter(method, pathname, fn_name, api, item){
+    item.method = item.method || [];
+
+    // set/update method list
+    if (!item.method.includes(method)){
+        item.method.push(method);
+    }
+
+    // express router register
+    app[method](pathname, request);
+
+    // express request call
+    function request(req, res){
+        api.__request__(req, res, (instance) => {
+            instance[fn_name](res);
+        });
+    }
+}

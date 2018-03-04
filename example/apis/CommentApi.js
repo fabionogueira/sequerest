@@ -4,4 +4,6 @@ const db = require('../config/db');
 class CommentApi extends Api {
 }
 
-module.exports = new CommentApi(db.getModel('comments'));
+module.exports = new CommentApi({
+    model: db.getModel('comments')
+});

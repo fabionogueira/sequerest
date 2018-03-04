@@ -101,4 +101,3 @@ function insert (sqModel, table, row, next) {
 };
 
 module.exports = DB;
-

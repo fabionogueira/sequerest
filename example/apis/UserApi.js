@@ -1,10 +1,11 @@
 const Api = require('../../src/api');
+const Authenticate = require('../config/auth');
 const db = require('../config/db');
 
 class UserApi extends Api {
     read(res) {
         let sqModel = this.getModel();
-        let options = this.getKeyFilters() || {};
+        let options = this.getReadOptions();
         let models = db.getModels();
 
         options.include = [{
@@ -55,4 +56,8 @@ class UserApi extends Api {
     }
 }
 
-module.exports = new UserApi(db.getModel('users'));
+module.exports = new UserApi({
+    model: db.getModel('users'),
+    ordering_fields:['id'],
+    authentication_classe: Authenticate
+});

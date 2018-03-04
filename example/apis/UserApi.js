@@ -3,6 +3,9 @@ const Authenticate = require('../config/auth');
 const db = require('../config/db');
 
 class UserApi extends Api {
+    get_test(res){
+        res.send('test ok')
+    }
     read(res) {
         let sqModel = this.getModel();
         let options = this.getReadOptions();

@@ -111,9 +111,10 @@ module.exports = class Server {
         }
         
         Object.getOwnPropertyNames(api.__proto__).forEach(k => {
-            method = k.split('_')[0];
+            let a = k.split('_');
+            method = a[0];
             if (method && 'get,post,put,delete'.includes(method)){
-                createRouter(method, item.pathname, k, api, item);
+                createRouter(method, item.pathname + a[1] + '/', k, api, item);
             }
         });
 
@@ -184,7 +185,7 @@ function createRouter(method, pathname, fn_name, api, item){
     // express request call
     function request(req, res){
         api.__request__(req, res, (instance) => {
-            instance[fn_name](res);
+            instance[fn_name](res, req);
         });
     }
 }

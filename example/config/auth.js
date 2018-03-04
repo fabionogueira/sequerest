@@ -1,13 +1,13 @@
-const BasicAuthenticate = require('../../src/authenticate/basic');
+const {TokenAuth} = require('../../src/auth');
 
 let SESSION = {};
 
-class Authentication extends BasicAuthenticate{
+class Auth extends TokenAuth{
     credentials(username, password, next){
         let error;
 
         if (SESSION[username+password]){
-            return next();
+            return next(null);
         }
 
         error = !(username == 'fabio' && password == 'nogueira');
@@ -16,8 +16,8 @@ class Authentication extends BasicAuthenticate{
             SESSION[username+password] = true;
         }
 
-        next(error);
+        next(error ? new Error('Invalidate credentials') : null);
     }
 }
 
-module.exports = Authentication;
+module.exports = Auth;

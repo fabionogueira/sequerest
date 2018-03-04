@@ -46,7 +46,8 @@ class Api {
             }
 
             if (error) {
-                return res.status(401).end('Access denied');
+                res.status(401);
+                return res.end(`Access denied. ${error.message}`);
             }
 
             this._filters = undefined;

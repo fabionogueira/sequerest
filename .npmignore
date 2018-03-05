@@ -1,4 +1,5 @@
 .vscode
+delete
 example
 node_modules
 .gitignore

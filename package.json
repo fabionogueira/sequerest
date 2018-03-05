@@ -1,5 +1,5 @@
 {
-  "name": "api-rest",
+  "name": "sequerest",
   "version": "0.0.9",
   "description": "",
   "main": "src/server.js",
@@ -33,10 +33,10 @@
     "jsonwebtoken": "^8.2.0",
     "md5": "^2.2.1",
     "request": "^2.81.0",
-    "sequelize": "^4.23.0",
-    "sequelize-cli": "^3.1.0"
+    "sequelize": "^4.23.0"
   },
   "devDependencies": {
+    "sequelize-cli": "^3.1.0",
     "@types/express": "^4.0.39",
     "@types/jsonwebtoken": "^7.2.3",
     "@types/md5": "^2.1.32",

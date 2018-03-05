@@ -4,57 +4,140 @@
 ```bash
 mkdir myapi
 cd myapi
-npm install api-rest
+npm install sequerest
 ```
 
-# main.js
+# create model
 ```javascript
-const rest = require('api-rest');
-
-// simple database only develop test
-const MyDB = new rest.Database("./mydb.json");
-
-const config = {
-    "port": "8080",
-    "public": "/path/to/public_files"
-}
-
-// sample the CRUD api
-const person = {
-    auth: true,
-    database: MyDB,
-    model: {
-        id: 0,
-        name: {
-            max_length: 20,
-            null: false,
-            verbose_name: 'Name',
-            default: undefined,
-            type: 'string'
+// ./users-model.js
+module.exports = (sequelize, DataTypes) => {
+    const Users = sequelize.define('users', {
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4,
+            allowNull: false
+        },
+        username: {
+            type: DataTypes.STRING,
+            required: true
         }
+    });
+
+    return Users;
+};
+```
+# create db
+```javascript
+// ./db.js
+const DB = require('sequerest/db');
+
+const db = new DB({
+    dialect: "sqlite",
+    storage: "path/to/database.sqlite",
+    define: {
+        underscored: true
+    }
+});
+
+// models/tables
+const users = db.addModel('users', require('./users-model.js'));
+
+// relations
+// const models = db.getModels();
+// users.hasMany(models.posts);
+
+module.exports = db;
+```
+# create authentication class
+```javascript
+// ./auth.js
+const {BasicAuth} = require('sequerest/auth');
+
+// simulate session
+let SESSION = {};
+
+class Auth extends BasicAuth{
+    credentials(username, password, next){
+        let error;
+
+        if (SESSION[username+password]){
+            return next(null);
+        }
+
+        error = !(username == 'user' && password == 'psw');
+
+        if (!error){
+            SESSION[username+password] = true;
+        }
+
+        next(error ? new Error('Invalidate credentials') : null);
     }
 }
 
-rest.Server
+module.exports = Auth;
+```
+
+# create api
+```javascript
+// ./user-api.js
+const Api = require('sequerest/api');
+const Auth = require('./auth');
+const db = require('./db');
+
+class UserApi extends Api {
+    get_test(res){
+        res.send('test ok')
+    }
+}
+
+module.exports = new UserApi({
+    model: db.getModel('users'),
+    ordering_fields:['id'],
+    authentication_classe: Auth
+});
+```
+# create server/routers
+```javascript
+// ./server.js
+const server = require('sequerest/server');
+const UserApi = require('./user-api');
+
+server
     // set config
-    .config(config)
-    
-    // register routers
-    .route('/api/person/', pessoa)
-    .route('/path/to/api', 'get', (req, res)=>{
-        res.send('ok');
+    .config({
+        CORS: true,
+        PORT: '8080'
     })
-	
+
+    // set routers
+    .route('/api/user/', UserApi)
+
     // start server
     .start();
 ```
 
-# start api
+# start server
 ```bash
-node main.js
+node server.js
 ```
 
 # list of registered api
 ```bash
 http://localhost:8080/
+```
+
+# testing
+```bash
+http://localhost:8080/
+GET http://localhost:8080/api/user/ List all
+GET http://localhost:8080/api/user/1 List one
+POST http://localhost:8080/api/user/ Insert
+PUT http://localhost:8080/api/user/1 Update
+DELETE http://localhost:8080/api/user/1 Delete
+GET http://localhost:8080/api/user/test/
+```
+
+```bash
+check example in: https://github.com/fabionogueira/sequerest/tree/master/example
 ```

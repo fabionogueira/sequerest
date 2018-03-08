@@ -1,11 +1,11 @@
-const api = require('./api');
-const db = require('./db');
-const server = require('./api');
+const Api = require('./api');
+const DB = require('./db');
+const Server = require('./api');
 const auth = require('./auth');
 
 module.exports = {
-    api,
-    db,
-    server,
+    Api,
+    DB,
+    Server,
     auth
 };

@@ -1,8 +1,8 @@
 {
   "name": "sequerest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
-  "main": "src/server.js",
+  "main": "src/",
   "repository": {
     "type": "git",
     "url": "https://github.com/fabionogueira/sequerest.git"
@@ -28,12 +28,16 @@
     "sequelize"
   ],
   "dependencies": {
+    "aws-sdk": "^2.206.0",
     "body-parser": "^1.17.1",
+    "dns": "^0.2.2",
     "express": "^4.15.2",
     "jsonwebtoken": "^8.2.0",
     "md5": "^2.2.1",
+    "pg-hstore": "^2.3.2",
     "request": "^2.81.0",
-    "sequelize": "^4.23.0"
+    "sequelize": "^4.23.0",
+    "tedious": "^2.3.1"
   },
   "devDependencies": {
     "sequelize-cli": "^3.1.0",
